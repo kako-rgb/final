@@ -3,31 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Team Analyzer Pro</title>
+    <title>Advanced Football Analyzer</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-        }
-
+        /* Base Styles */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 0;
             min-height: 100vh;
             position: relative;
         }
 
-        .background-image {
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://example.com/soccer-bg.jpg');
+        .background-enabled {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('default-bg.jpg');
             background-size: cover;
             background-position: center;
+            color: white;
         }
 
+        /* Navigation Bar */
         nav {
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.9);
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
@@ -36,225 +33,394 @@
 
         .logo {
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
+            font-family: 'Impact', sans-serif;
         }
 
         .auth-buttons button {
-            margin-left: 1rem;
-            padding: 0.5rem 1rem;
-            border: none;
+            margin-left: 1.5rem;
+            padding: 0.8rem 1.5rem;
             border-radius: 5px;
             cursor: pointer;
+            background: #3498db;
+            color: white;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        /* Search Section */
+        .search-section {
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .search-container {
-            display: flex;
-            gap: 2rem;
-            padding: 2rem;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 2rem;
         }
 
         .search-box {
             position: relative;
-            width: 300px;
         }
 
-        input {
+        .search-input {
             width: 100%;
-            padding: 1rem;
-            font-size: 1rem;
-            border: 2px solid var(--primary-color);
+            padding: 1.2rem;
+            font-size: 1.1rem;
+            border: 2px solid #3498db;
             border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
         }
 
-        .autocomplete-items {
+        .autocomplete-list {
             position: absolute;
-            border: 1px solid #ddd;
-            z-index: 99;
-            top: 100%;
-            left: 0;
-            right: 0;
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
             background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 5px;
+            z-index: 1000;
+            display: none;
         }
 
         .autocomplete-item {
-            padding: 0.5rem;
+            padding: 1rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             border-bottom: 1px solid #eee;
+            transition: background 0.2s ease;
         }
 
-        .autocomplete-item img {
-            width: 30px;
+        .autocomplete-item:hover {
+            background: #f8f9fa;
+        }
+
+        .team-logo {
+            width: 40px;
+            height: 40px;
             margin-right: 1rem;
+            object-fit: contain;
         }
 
-        .team-details {
+        .team-info {
+            flex-grow: 1;
+        }
+
+        .team-league {
             font-size: 0.8rem;
             color: #666;
         }
 
-        button.compare-btn {
-            background: var(--secondary-color);
-            color: white;
-            padding: 1rem 2rem;
-            margin: 1rem auto;
-            display: block;
+        /* Chart and Predictions */
+        #chartContainer {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 1200px;
         }
 
-        /* Add other styles from previous version */
-        
-        /* AI Model Styles */
         .prediction {
-            background: rgba(255,255,255,0.9);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
             padding: 2rem;
-            margin: 2rem;
-            border-radius: 10px;
+            border-radius: 12px;
+            margin: 2rem auto;
+            max-width: 1200px;
         }
-</style>
+    </style>
 </head>
 <body>
     <nav>
-        <div class="logo">FootyAnalystAI</div>
+        <div class="logo">FootAIlytics</div>
         <div class="auth-buttons">
             <button class="signup-btn">Sign Up</button>
             <button class="login-btn">Login</button>
         </div>
     </nav>
 
-    <div class="search-container">
-        <div class="search-box">
-            <input type="text" id="homeTeam" placeholder="Enter home team">
-            <div class="autocomplete-items" id="homeSuggestions"></div>
+    <div class="search-section">
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="homeTeam" class="search-input" placeholder="Enter home team">
+                <div class="autocomplete-list" id="homeSuggestions"></div>
+            </div>
+            <div class="search-box">
+                <input type="text" id="awayTeam" class="search-input" placeholder="Enter away team">
+                <div class="autocomplete-list" id="awaySuggestions"></div>
+            </div>
         </div>
-        <div class="search-box">
-            <input type="text" id="awayTeam" placeholder="Enter away team">
-            <div class="autocomplete-items" id="awaySuggestions"></div>
-        </div>
+        <button class="compare-btn" onclick="compareTeams()">Analyze Teams</button>
     </div>
 
-    <button class="compare-btn" onclick="compareTeams()">Compare Teams</button>
-
-    <!-- Rest of previous content -->
+    <div id="chartContainer">
+        <canvas id="statsChart"></canvas>
+    </div>
+    <div class="prediction" id="prediction"></div>
 
     <script>
-        // Mock Database
-        const teamsDatabase = {
+        // Configuration
+        const API_ENABLED = false; // Set to true in production
+        const API_KEY = 'your-api-key-here';
+        const MODEL_PATH = '/models/trained_model.joblib';
+
+        // Enhanced Mock Database
+        const footballDatabase = {
             'Al Khor SC': {
-                logo: 'al-khor-logo.png',
-                league: 'Qatar Stars League - Men',
-                stats: { /* previous stats */ }
+                logo: 'logos/al-khor.png',
+                league: 'Qatar Stars League - Men (U21)',
+                stats: {
+                    wins: 8,
+                    losses: 3,
+                    draws: 4,
+                    goalsFor: 22,
+                    goalsAgainst: 14,
+                    injuries: 2,
+                    cleanSheets: 5,
+                    redCards: 1,
+                    position: 4
+                }
             },
             'Al-Ahli Doha': {
-                logo: 'ahli-doha-logo.png',
-                league: 'Qatar Stars League - Men',
-                stats: { /* previous stats */ }
+                logo: 'logos/al-ahli.png',
+                league: 'Qatar Stars League - Men (First Team)',
+                stats: {
+                    wins: 12,
+                    losses: 2,
+                    draws: 3,
+                    goalsFor: 35,
+                    goalsAgainst: 12,
+                    injuries: 1,
+                    cleanSheets: 8,
+                    redCards: 0,
+                    position: 2
+                }
             }
         };
 
-        // API Simulation
-        async function fetchTeamData(teamName) {
-            // Simulate API call
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    if (teamsDatabase[teamName]) {
-                        resolve(teamsDatabase[teamName]);
-                    } else {
-                        reject('Team not found');
+        // API Service
+        class FootballDataService {
+            constructor() {
+                this.cache = new Map();
+            }
+
+            async getTeamData(teamName) {
+                if (API_ENABLED) {
+                    try {
+                        const response = await fetch(`https://api.example.com/teams?name=${teamName}&api_key=${API_KEY}`);
+                        return await response.json();
+                    } catch (error) {
+                        console.error('API Error, using cached data:', error);
+                        return this.getLocalData(teamName);
                     }
-                }, 500);
-            });
+                }
+                return this.getLocalData(teamName);
+            }
+
+            getLocalData(teamName) {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        resolve(footballDatabase[teamName] || null);
+                    }, 300);
+                });
+            }
         }
 
-        // Autocomplete Feature
-        function showSuggestions(input, suggestionsId) {
-            const inputVal = input.value.toLowerCase();
-            const suggestions = Object.keys(teamsDatabase).filter(team => 
-                team.toLowerCase().includes(inputVal)
-            );
-            
-            const suggestionsHTML = suggestions.map(team => `
-                <div class="autocomplete-item" onclick="selectTeam('${team}', '${input.id}')">
-                    <img src="${teamsDatabase[team].logo}" alt="${team} logo">
-                    <div>
-                        <div>${team}</div>
-                        <div class="team-details">${teamsDatabase[team].league}</div>
-                    </div>
-                </div>
-            `).join('');
-            
-            document.getElementById(suggestionsId).innerHTML = suggestionsHTML;
-        }
-
-        function selectTeam(teamName, inputId) {
-            document.getElementById(inputId).value = teamName;
-            document.getElementById(inputId === 'homeTeam' ? 'homeSuggestions' : 'awaySuggestions').innerHTML = '';
-        }
-
-        // Event Listeners
-        document.getElementById('homeTeam').addEventListener('input', function() {
-            showSuggestions(this, 'homeSuggestions');
-        });
-
-        document.getElementById('awayTeam').addEventListener('input', function() {
-            showSuggestions(this, 'awaySuggestions');
-        });
-
-        // Enhanced AI Model
+        // AI Prediction Engine
         class MatchPredictor {
             constructor() {
-                // This should be replaced with actual model loading in production
-                // this.model = this.loadModel();
+                this.model = null;
+                this.loadModel();
             }
 
             async loadModel() {
-                // In production: Load joblib model
-                // const model = await joblib.load('trained_model.joblib');
-                return mockPredict;
+                if (typeof joblib !== 'undefined') {
+                    try {
+                        this.model = await joblib.load(MODEL_PATH);
+                    } catch (error) {
+                        console.error('Model loading failed:', error);
+                    }
+                }
             }
 
             async predict(homeData, awayData) {
-                // Real implementation would use:
-                // return this.model.predict(prepareFeatures(homeData, awayData));
-                
-                // Mock prediction
+                if (this.model) {
+                    const features = this.prepareFeatures(homeData, awayData);
+                    return this.model.predict(features);
+                }
+                return this.fallbackPrediction(homeData, awayData);
+            }
+
+            prepareFeatures(home, away) {
                 return {
-                    winner: this.calculateWinner(homeData, awayData),
-                    goals: this.predictGoals(homeData, awayData),
-                    cleanSheet: this.predictCleanSheet(homeData, awayData)
+                    homeWins: home.stats.wins,
+                    awayWins: away.stats.wins,
+                    goalDifference: home.stats.goalsFor - away.stats.goalsAgainst,
+                    // ... other features
                 };
             }
 
-            calculateWinner(home, away) {
-                // Enhanced logic
-                const homeStrength = home.stats.wins * 0.4 + home.stats.cleanSheets * 0.3;
-                const awayStrength = away.stats.wins * 0.35 + away.stats.cleanSheets * 0.25;
-                return homeStrength > awayStrength ? 'Home Team' : 'Away Team';
-            }
-
-            predictGoals(home, away) {
-                const avgGoals = (home.stats.goalsFor + away.stats.goalsAgainst) / 5;
-                return avgGoals > 2.5 ? 'Over 2.5' : 'Under 2.5';
-            }
-
-            predictCleanSheet(home, away) {
-                const cleanSheetProb = (home.stats.cleanSheets + (15 - away.stats.goalsFor)) / 20;
-                return cleanSheetProb > 0.5 ? 'Likely' : 'Unlikely';
+            fallbackPrediction(home, away) {
+                // Enhanced heuristic-based prediction
+                const homeStrength = home.stats.wins * 0.4 + 
+                                  home.stats.cleanSheets * 0.3 -
+                                  home.stats.injuries * 0.1;
+                
+                const awayWeakness = away.stats.losses * 0.4 +
+                                   away.stats.redCards * 0.2;
+                
+                const totalGoals = (home.stats.goalsFor + away.stats.goalsAgainst) / 5;
+                
+                return {
+                    winner: homeStrength > awayWeakness ? home.name : away.name,
+                    goalsOverUnder: totalGoals > 2.5 ? 'Over 2.5' : 'Under 2.5',
+                    cleanSheetProbability: Math.min(0.9, home.stats.cleanSheets / 10 + 0.4)
+                };
             }
         }
 
-        // Usage
+        // UI Components
+        class Autocomplete {
+            constructor(inputId, suggestionsId) {
+                this.input = document.getElementById(inputId);
+                this.suggestions = document.getElementById(suggestionsId);
+                this.dataService = new FootballDataService();
+                this.setupListeners();
+            }
+
+            setupListeners() {
+                this.input.addEventListener('input', async () => {
+                    const searchTerm = this.input.value.trim();
+                    if (searchTerm.length < 2) {
+                        this.suggestions.style.display = 'none';
+                        return;
+                    }
+                    
+                    const teams = await this.dataService.getTeamData(searchTerm);
+                    this.showSuggestions(teams);
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!this.suggestions.contains(e.target)) {
+                        this.suggestions.style.display = 'none';
+                    }
+                });
+            }
+
+            showSuggestions(teams) {
+                this.suggestions.innerHTML = Object.keys(teams)
+                    .map(teamName => this.createSuggestionItem(teamName, teams[teamName]))
+                    .join('');
+                this.suggestions.style.display = 'block';
+            }
+
+            createSuggestionItem(teamName, teamData) {
+                return `
+                    <div class="autocomplete-item" data-team="${teamName}">
+                        <img src="${teamData.logo}" class="team-logo" alt="${teamName} logo">
+                        <div class="team-info">
+                            <div>${teamName}</div>
+                            <div class="team-league">${teamData.league}</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize Autocomplete
+        new Autocomplete('homeTeam', 'homeSuggestions');
+        new Autocomplete('awayTeam', 'awaySuggestions');
+
+        // Main Comparison Function
+        let myChart = null;
         const predictor = new MatchPredictor();
 
-        // Background Image Toggle
-        function toggleBackground() {
-            document.body.classList.toggle('background-image');
+        async function compareTeams() {
+            const homeTeam = document.getElementById('homeTeam').value;
+            const awayTeam = document.getElementById('awayTeam').value;
+            
+            const dataService = new FootballDataService();
+            const homeData = await dataService.getTeamData(homeTeam);
+            const awayData = await dataService.getTeamData(awayTeam);
+
+            if (!homeData || !awayData) {
+                alert('Please select valid teams from suggestions');
+                return;
+            }
+
+            renderChart(homeData, awayData);
+            showPredictions(homeData, awayData);
         }
 
-        // Initialize with background
-        toggleBackground(); // Remove this line if you don't want default background
+        function renderChart(homeData, awayData) {
+            if (myChart) myChart.destroy();
+
+            const ctx = document.getElementById('statsChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: createChartData(homeData, awayData),
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function createChartData(homeData, awayData) {
+            return {
+                labels: ['Wins', 'Losses', 'Draws', 'GF', 'GA', 'Injuries', 'CS', 'Red Cards'],
+                datasets: [{
+                    label: homeData.name,
+                    data: extractStats(homeData.stats),
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                }, {
+                    label: awayData.name,
+                    data: extractStats(awayData.stats),
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                }]
+            };
+        }
+
+        function extractStats(stats) {
+            return [
+                stats.wins,
+                stats.losses,
+                stats.draws,
+                stats.goalsFor,
+                stats.goalsAgainst,
+                stats.injuries,
+                stats.cleanSheets,
+                stats.redCards
+            ];
+        }
+
+        async function showPredictions(homeData, awayData) {
+            const prediction = await predictor.predict(homeData, awayData);
+            const predictionHTML = `
+                <h2>AI Prediction Results</h2>
+                <p>🏆 Likely Winner: <strong>${prediction.winner}</strong></p>
+                <p>⚽ Goals Forecast: <strong>${prediction.goalsOverUnder}</strong></p>
+                <p>🛡️ Clean Sheet Probability: <strong>${Math.round(prediction.cleanSheetProbability * 100)}%</strong></p>
+                <div class="league-info">
+                    <p>${homeData.name} Position: ${homeData.stats.position}</p>
+                    <p>${awayData.name} Position: ${awayData.stats.position}</p>
+                </div>
+            `;
+            document.getElementById('prediction').innerHTML = predictionHTML;
+        }
+
+        // Background Image Toggle
+        function toggleBackground(enable) {
+            document.body.classList.toggle('background-enabled', enable);
+        }
+        toggleBackground(true);
     </script>
 </body>
 </html>
