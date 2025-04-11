@@ -52,12 +52,12 @@ const VendorCard = ({ vendor }: VENDOR_CARD_PROPS) => {
         </CardMedia>
         <CardContent sx={{ marginTop: '40px' }}>
             <Stack gap={1} alignItems='center'>
-                <Typography variant='h6' fontWeight={600}>{vendor.name}</Typography>
-                <Typography variant='body2' color='textSecondary'>{vendor.business.category}</Typography>
+                <Typography variant='h6' fontWeight={600}>{vendor?.name}</Typography>
+                <Typography variant='body2' color='textSecondary'>
+                    {vendor?.business?.category || 'No category'}
+                </Typography>
                 <Stack gap={1} alignItems='center' direction='row'>
-                    <Rating size='small' readOnly value={vendor.rating} precision={0.1} />
-                    {/* <div style={{ height: '6px', width: '6px', borderRadius: '50%', background: '#000' }} /> */}
-                    {/* <Typography variant='body2'>{vendor.products.toLocaleString('en-US')} products</Typography> */}
+                    <Rating size='small' readOnly value={vendor?.rating || 0} precision={0.1} />
                 </Stack>
             </Stack>
         </CardContent>

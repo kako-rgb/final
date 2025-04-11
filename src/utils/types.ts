@@ -18,41 +18,17 @@ export type ATTRIBUTE = {
     values: string[]
 }
 
-export type STORE = {
-   logo: {
-        ref?: string,
-        link?: string
-    },
-    banner: {
-        ref?: string,
-        link?: string
-    },
-    business: {
-        socials?: {
-            url?: string,
-            instagram?: string,
-            facebook?: string,
-            twitter?: string,
-            linkedin?: string,
-            youtube?: string,
-            tiktok?: string
-        },
-        name: string,
-        type: string,
-        address?: string,
-        registrationNumber?: string,
-        category?: string,
-        description?: string
-    },
-    rating?: number,
-    _id: string,
-    name: string,
-    slug: string,
-    createdAt: Date,
-    description?: string,
-    policy?: string,
-    returnPolicy?: string,
-    shippingPolicy?: string
+export interface STORE {
+    name: string;
+    slug: string;
+    logo?: {
+        link: string;
+    };
+    business?: {
+        category: string;
+    };
+    rating?: number;
+    // ...other properties
 }
 
 export type PRODUCT = {

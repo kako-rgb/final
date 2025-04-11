@@ -34,20 +34,16 @@ const Providers = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>
-        <div className={inter.className}>
-          <SnackbarProvider>
-            <SessionProvider>
-              <NextTopLoader color={PRIMARY_COLOR.main} showSpinner={false} />
-              <AppRouterCacheProvider>
-                <ThemeProvider>{children}</ThemeProvider>
-              </AppRouterCacheProvider>
-            </SessionProvider>
-          </SnackbarProvider>
-        </div>
-      </body>
-    </html>
+    <div className={inter.className}>
+      <SnackbarProvider>
+        <SessionProvider>
+          <NextTopLoader color={PRIMARY_COLOR.main} showSpinner={false} />
+          <AppRouterCacheProvider>
+            <ThemeProvider>{children}</ThemeProvider>
+          </AppRouterCacheProvider>
+        </SessionProvider>
+      </SnackbarProvider>
+    </div>
   )
 }
 

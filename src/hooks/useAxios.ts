@@ -8,7 +8,25 @@ export const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true
+  withCredentials: true,
+});
+
+// Add request interceptor
+axiosInstance.interceptors.request.use((config) => {
+  // Ensure the URL is absolute
+  if (!config.url?.startsWith('http')) {
+    config.url = `${baseURL}${config.url}`;
+  }
+
+  config.retry = 3;
+
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
 });
 
 // Add retry logic
@@ -22,19 +40,6 @@ axiosInstance.interceptors.response.use(undefined, async (error) => {
   const delayRetry = new Promise(resolve => setTimeout(resolve, 1000));
   await delayRetry;
   return axiosInstance(config);
-});
-
-// Add default retry count to requests
-axiosInstance.interceptors.request.use((config) => {
-  config.retry = 3;
-
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-  return config;
 });
 
 const useAxios = () => {
