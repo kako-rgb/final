@@ -2,6 +2,10 @@ import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
+interface CustomAxiosRequestConfig extends AxiosRequestConfig {
+  token?: string;
+}
+
 export const axiosInstance = axios.create({
   baseURL,
   timeout: 5000,
@@ -10,18 +14,18 @@ export const axiosInstance = axios.create({
   }
 });
 
-const useAxios = (token?: string) => {
-  const request = async (config: AxiosRequestConfig): Promise<AxiosResponse> => {
+const useAxios = () => {
+  const request = async (config: CustomAxiosRequestConfig): Promise<AxiosResponse> => {
     try {
       if (!config.url) {
         throw new Error('URL is required');
       }
 
-      // Add token to headers if provided
-      if (token) {
+      // Add token to headers if provided in config
+      if (config.token) {
         config.headers = {
           ...config.headers,
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${config.token}`
         };
       }
 
