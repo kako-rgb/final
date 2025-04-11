@@ -9,29 +9,47 @@ import TrendingProducts from "@/sections/home/trending-products";
 import { headers } from 'next/headers';
 
 export default async function Home() {
-
   headers();
 
   const request = useAxios();
 
-  const response = await request({
-    method: 'get',
-    path: '/?prodLimit=8&servLimit=8&storeLimit=3'
-  })
+  try {
+    const response = await request({
+      method: 'get',
+      url: '/api/home', // Change this to your actual API endpoint
+      params: {
+        prodLimit: 8,
+        servLimit: 8,
+        storeLimit: 3
+      }
+    });
 
-  return (
-    <>
-      <TopBanner />
-      <CategorySection />
-      <TrendingProducts />
-      <BecomeVendor />
-      <PopularServices />
-      <TopRatedVendors stores={response.data.stores} />
-      <Setter
-        categories={response.data.categories}
-        products={response.data.products}
-        services={response.data.services}
-      />
-    </>
-  );
+    return (
+      <>
+        <TopBanner />
+        <CategorySection />
+        <TrendingProducts />
+        <BecomeVendor />
+        <PopularServices />
+        <TopRatedVendors stores={response?.data?.stores || []} />
+        <Setter
+          categories={response?.data?.categories || []}
+          products={response?.data?.products || []}
+          services={response?.data?.services || []}
+        />
+      </>
+    );
+  } catch (error) {
+    console.error('Failed to fetch data:', error);
+    // Fallback UI in case of error
+    return (
+      <>
+        <TopBanner />
+        <CategorySection />
+        <TrendingProducts />
+        <BecomeVendor />
+        <PopularServices />
+      </>
+    );
+  }
 }

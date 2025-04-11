@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "NODE_OPTIONS='--max-old-space-size=4096' next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_OPTIONS='--max-old-space-size=4096' next start",
     "lint": "next lint"
   },
   "dependencies": {
@@ -24,7 +24,7 @@
     "highlight.js": "^11.11.1",
     "jsonwebtoken": "^9.0.2",
     "mui-tel-input": "^8.0.1",
-    "next": "15.2.2",
+    "next": "^15.3.0",
     "next-auth": "^4.24.11",
     "nextjs-toploader": "^3.7.15",
     "notistack": "^3.0.2",
@@ -44,6 +44,8 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@swc/cli": "^0.6.0",
+    "@swc/core": "^1.11.18",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/numeral": "^2.0.5",

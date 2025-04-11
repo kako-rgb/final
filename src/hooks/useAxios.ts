@@ -1,120 +1,42 @@
-import { HOST_API } from '@/config';
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, RawAxiosRequestHeaders } from 'axios';
-import { signOut } from 'next-auth/react';
+import axios from 'axios';
 
-export const axiosInstance = axios.create({ baseURL: HOST_API });
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
-axiosInstance.interceptors.response.use(
-  (res) => res,
-  (error) => Promise.reject((error.response && error.response.data) || 'Something went wrong')
-);
+export const axiosInstance = axios.create({
+  baseURL,
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true
+});
 
-type AxiosProps = {
-    method: string,
-    path: string,
-    pathData?: any
-}
-
-export function axiosHandler(token?: string) {
-
-  let config: AxiosRequestConfig ;
-  
-  let headers: RawAxiosRequestHeaders;
-  
+axiosInstance.interceptors.request.use((config) => {
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('token');
     if (token) {
-      headers = {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      };
-    } else {
-      headers = {
-        "Content-Type": "application/json",
-      };
+      config.headers.Authorization = `Bearer ${token}`;
     }
-   
-  const axiosInst: AxiosInstance = axios.create({
-      headers: headers,
-      timeout: 200000,
-  });
-  
-  
-   
-  function request({ method ,pathData ,path }: AxiosProps){
-  
-      if (pathData){
-          config ={
-              url: path,
-              baseURL: HOST_API,
-              method: method,
-              data: pathData
-          }
-       } else {
-          config ={
-              url: path,
-              baseURL: HOST_API,
-              method: method    
-          } 
-       }
-  
-      const response: Promise<AxiosResponse> = axiosInst(config)
-      return response
-   }
-    
-    return request
-}
+  }
+  return config;
+});
 
-export default function useAxios(token?: string) {
-
-    let config: AxiosRequestConfig ;
-    
-    let headers: RawAxiosRequestHeaders;
-    
-      if (token) {
-        headers = {
-          Authorization: "Bearer " + token,
-          "Content-Type": "application/json",
-        };
-      } else {
-        headers = {
-          "Content-Type": "application/json",
-        };
+const useAxios = () => {
+  const request = async (config: AxiosRequestConfig): Promise<AxiosResponse> => {
+    try {
+      if (!config.url) {
+        throw new Error('URL is required');
       }
-     
-    const axiosInst: AxiosInstance = axios.create({
-        headers: headers,
-        timeout: 200000,
-    });
-    
 
-    axiosInst.interceptors.response.use(async function (response) {
-      if (response.status === 401) {
-        console.log('Error');
-        await signOut();
-      }
+      const response = await axiosInstance(config);
       return response;
-    });
-    
-     
-    function request({ method ,pathData ,path }: AxiosProps){
-    
-        if (pathData){
-            config ={
-                url: path,
-                baseURL: HOST_API,
-                method: method,
-                data: pathData
-            }
-         } else {
-            config ={
-                url: path,
-                baseURL: HOST_API,
-                method: method    
-            } 
-         }
-    
-        const response: Promise<AxiosResponse> = axiosInst(config);
-        return response
-     }
-      
-    return request
-}
+    } catch (error) {
+      console.error('Axios request failed:', error);
+      throw error;
+    }
+  };
+
+  return request;
+};
+
+export default useAxios;
